@@ -5,19 +5,19 @@ import "./App.css";
 function App() {
   const [data, setData] = useState({ hits: [] });
   const [query, setQuery] = useState("redux");
-  const [search, setSearch] = useState("redux");
+  const [url, setUrl] = useState(
+    "https://hn.algolia.com/api/v1/search?query=redux"
+  );
 
   useEffect(() => {
     async function fetchData() {
-      const result = await axios(
-        `https://hn.algolia.com/api/v1/search?query=${search}`
-      );
+      const result = await axios(url);
 
       setData(result.data);
     }
 
     fetchData();
-  }, [search]);
+  }, [url]);
 
   return (
     <>
@@ -26,7 +26,12 @@ function App() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <button type="button" onClick={() => setSearch(query)}>
+      <button
+        type="button"
+        onClick={() =>
+          setUrl(`http://hn.algolia.com/api/v1/search?query=${query}`)
+        }
+      >
         Search
       </button>
 
