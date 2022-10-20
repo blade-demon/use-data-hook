@@ -1,53 +1,28 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import useDataApi from "./hooks/useDataApi";
 import "./App.css";
 
 function App() {
-  const [data, setData] = useState({ hits: [] });
   const [query, setQuery] = useState("redux");
-  const [url, setUrl] = useState(
-    "http://hn.algolia.com/api/v1/search?query=redux"
+
+  const [{ data, isLoading, isError }, doFetch] = useDataApi(
+    "https://hn.algolia.com/api/v1/search?query=redux",
+    { hits: [] }
   );
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    async function fetchData() {
-      setIsError(false);
-      setIsLoading(true);
-
-      try {
-        const result = await axios(url);
-
-        setData(result.data);
-      } catch (error) {
-        console.log(error);
-        setIsError(true);
-      }
-
-      setIsLoading(false);
-    }
-
-    fetchData();
-  }, [url]);
-
   return (
-    <>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        doFetch(`http://hn.algolia.com/api/v1/search?query=${query}`);
+      }}
+    >
       <input
         type="text"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <button
-        type="button"
-        onClick={() =>
-          setUrl(`http://hn.algolia.com/api/v1/search?query=${query}`)
-        }
-      >
-        Search
-      </button>
+      <button type="submit">Search</button>
 
       {isError && <div>Something went wrong ...</div>}
 
@@ -62,7 +37,7 @@ function App() {
           ))}
         </ul>
       )}
-    </>
+    </form>
   );
 }
 
