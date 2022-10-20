@@ -6,17 +6,26 @@ function App() {
   const [data, setData] = useState({ hits: [] });
   const [query, setQuery] = useState("redux");
   const [url, setUrl] = useState(
-    "https://hn.algolia.com/api/v1/search?query=redux"
+    "http://hn.algolia.com/api/v1/search?query=redux"
   );
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isError, setIsError] = useState(false);
+
   useEffect(() => {
     async function fetchData() {
+      setIsError(false);
       setIsLoading(true);
 
-      const result = await axios(url);
-      setData(result.data);
+      try {
+        const result = await axios(url);
+
+        setData(result.data);
+      } catch (error) {
+        console.log(error);
+        setIsError(true);
+      }
 
       setIsLoading(false);
     }
@@ -40,11 +49,13 @@ function App() {
         Search
       </button>
 
+      {isError && <div>Something went wrong ...</div>}
+
       {isLoading ? (
         <div>Loading ...</div>
       ) : (
         <ul>
-          {data.hits.map((item) => (
+          {data?.hits?.map((item) => (
             <li key={item.objectID}>
               <a href={item.url}>{item.title}</a>
             </li>
